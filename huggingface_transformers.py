@@ -228,6 +228,17 @@ def _(model_details, model_name, tokenizer, torch):
     #     label = config.id2label[i]
     #     print(f"{i+1}) {label}: {probability}")
 
+    """
+    Above same as this code : 
+        from transformers import pipeline
+    
+        model_name = "cardiffnlp/twitter-roberta-base-sentiment-latest"
+        text = "I love using the Transformers library!"
+    
+        full_pipeline = pipeline(model=model_name)
+        full_pipeline(text)
+    """
+
     from transformers import AutoConfig
 
     config = AutoConfig.from_pretrained(model_name)
