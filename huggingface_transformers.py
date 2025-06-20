@@ -14,7 +14,7 @@ def _():
 def _():
     import transformers
     import torch
-    return
+    return (torch,)
 
 
 @app.cell
@@ -145,6 +145,8 @@ def _(mo):
 
 @app.cell
 def _(model_name):
+    # Explore current 
+
     from transformers import AutoTokenizer
 
     # same model_name from cell http://localhost:2718/#scrollTo=sentimentanalysermodel
@@ -161,6 +163,90 @@ def _(model_name):
 
     print(f"Current vocabulary size for {model_name} : {tokenizer.vocab_size}")
 
+    return (tokenizer,)
+
+
+@app.cell
+def _(tokenizer):
+    # Add new tokens
+
+    new_tokens = [
+        "Garuda",
+        "whaleshark"
+    ]
+
+    # Token ID 3 corresponds to <unk>, which is the default token for input tokens that aren’t in the vocabulary.
+    print(tokenizer.convert_tokens_to_ids(new_tokens), end="\n\n")
+    print(f"{tokenizer.convert_ids_to_tokens(3)}, {tokenizer.convert_ids_to_tokens(50265)}")
+
+    print(tokenizer.add_tokens(new_tokens))
+
+    print(f"{tokenizer.convert_tokens_to_ids(new_tokens)}")
+    return
+
+
+@app.cell
+def _(model_name):
+    # load the model object directly using AutoModelForSequenceClassification
+
+    from transformers import AutoModelForSequenceClassification
+
+    model_details = AutoModelForSequenceClassification.from_pretrained(model_name)
+    print(model_details,end="\n\n")
+    print(model_details.roberta.embeddings)
+    return (model_details,)
+
+
+@app.cell
+def _(model_details, model_name, tokenizer, torch):
+    # Full pipeline
+
+
+    # import torch
+    # from transformers import (
+    #     AutoTokenizer,
+    #     AutoModelForSequenceClassification,
+    #     AutoConfig
+    # )
+
+    # model_name = "cardiffnlp/twitter-roberta-base-sentiment-latest"
+
+    # config = AutoConfig.from_pretrained(model_name)
+    # tokenizer = AutoTokenizer.from_pretrained(model_name)
+    # model = AutoModelForSequenceClassification.from_pretrained(model_name)
+
+    # text = "I love using the Transformers library!"
+    # encoded_input = tokenizer(text, return_tensors="pt")
+
+    # with torch.no_grad():
+    #     output = model(**encoded_input)
+
+    # scores = output.logits[0]
+    # probabilities = torch.softmax(scores, dim=0)
+
+    # for i, probability in enumerate(probabilities):
+    #     label = config.id2label[i]
+    #     print(f"{i+1}) {label}: {probability}")
+
+    from transformers import AutoConfig
+
+    config = AutoConfig.from_pretrained(model_name)
+
+    # Define text and tokenize it with tokenizer(). 
+    text = "I love using the Transformers library!"
+    encoded_input_for_pipeline = tokenizer(text, return_tensors="pt")
+
+    # Then pass the tokenized input, encoded_input, to the model object and store the results as output
+    # Speed up model inference by disabling gradient calculations.
+    with torch.no_grad():
+        output = model_details(**encoded_input_for_pipeline)
+
+    scores = output.logits[0]
+    probabilities = torch.softmax(scores, dim=0)
+
+    for i, probability in enumerate(probabilities):
+        label = config.id2label[i]
+        print(f"{i+1}) {label}: {probability}")
     return
 
 
