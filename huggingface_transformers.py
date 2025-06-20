@@ -95,5 +95,47 @@ def _(pipeline):
     return
 
 
+@app.cell
+def _(mo):
+    mo.md(r"""## Zero shot image classifier""")
+    return
+
+
+@app.cell
+def _(pipeline):
+    """
+    No model specified,so uses default model
+    """
+    image_classifier = pipeline(task="image-classification")
+    print(f"The default model picked by pipeline is {image_classifier.model.name_or_path}")
+
+    predictions = image_classifier(["farm-animal-portraits-rob-macinnis-fb.png"])
+
+    print(f"Predictions : \n {predictions}",end="\n\n")
+
+    print(f"Total Predictions : {len(predictions[0])}")
+    for prediction in predictions[0] :
+        print(f"{prediction}")
+
+    print("\n")
+
+    predictions = image_classifier(["kuvasz-dog-breed-full-body.webp"])
+    for prediction in predictions[0] :
+        print(f"{prediction}")
+
+    print("\n")
+
+    predictions = image_classifier(["Musk-ox.jpg.webp"])
+    for prediction in predictions[0] :
+        print(f"{prediction}")
+
+    print("\n")
+
+    predictions = image_classifier(["images.jpeg"])
+    for prediction in predictions[0] :
+        print(f"{prediction}")
+    return
+
+
 if __name__ == "__main__":
     app.run()
