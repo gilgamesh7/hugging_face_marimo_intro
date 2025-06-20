@@ -32,7 +32,7 @@ def _():
 
 
 @app.cell
-def _(pipeline):
+def sentimentanalysermodel(pipeline):
     model_name = "cardiffnlp/twitter-roberta-base-sentiment-latest"
     sentiment_classifier = pipeline(model=model_name)
 
@@ -52,7 +52,7 @@ def _(pipeline):
     ]
     print(*sentiment_classifier(text_input_list), sep='\n')
 
-    return
+    return (model_name,)
 
 
 @app.cell
@@ -134,6 +134,33 @@ def _(pipeline):
     predictions = image_classifier(["images.jpeg"])
     for prediction in predictions[0] :
         print(f"{prediction}")
+    return
+
+
+@app.cell
+def _(mo):
+    mo.md(r"""## Fine tuning""")
+    return
+
+
+@app.cell
+def _(model_name):
+    from transformers import AutoTokenizer
+
+    # same model_name from cell http://localhost:2718/#scrollTo=sentimentanalysermodel
+    tokenizer = AutoTokenizer.from_pretrained(model_name)
+    input_text = "I really want to go to an island. Do you want to go?"
+
+    # Tokenize
+    encoded_input = tokenizer(input_text)
+    print(encoded_input, end="\n\n")
+    print(encoded_input["input_ids"], end="\n\n")
+
+    # Reconvert token to text
+    print(tokenizer.convert_ids_to_tokens(encoded_input["input_ids"]), end="\n\n")
+
+    print(f"Current vocabulary size for {model_name} : {tokenizer.vocab_size}")
+
     return
 
 
